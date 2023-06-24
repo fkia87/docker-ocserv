@@ -1,7 +1,5 @@
 FROM alpine:latest
 
-MAINTAINER Pezhvak
-
 RUN apk update && apk add musl-dev iptables gnutls-dev gnutls-utils readline-dev libnl3-dev lz4-dev libseccomp-dev libev-dev
 
 RUN buildDeps="xz openssl gcc autoconf make linux-headers"; \
@@ -20,28 +18,19 @@ RUN buildDeps="xz openssl gcc autoconf make linux-headers"; \
 	&& ./configure \
 	&& make -j"$(nproc)" \
 	&& make install \
-	&& mkdir -p /etc/ocserv/data \
+	&& mkdir -p /etc/ocserv \
 	&& cd \
 	&& rm -rf ./$OC_FILE \
 	&& apk del --purge $buildDeps
 
-COPY config/ocserv.conf /etc/ocserv/ocserv.conf
-RUN chmod 655 /etc/ocserv/ocserv.conf
-COPY config/no-route.txt /tmp/
-RUN set -x \
-        && sed -i 's/^no-route/#no-route/' /etc/ocserv/ocserv.conf \        
-        && cat /tmp/no-route.txt >> /etc/ocserv/ocserv.conf \
-        && rm -rf /tmp/no-route.txt \
-        && touch /etc/ocserv/data/ocpaswd
+# WORKDIR /etc/ocserv
 
-WORKDIR /etc/ocserv
+COPY docker-entrypoint.sh /entrypoint.sh
 
-COPY scripts/docker-entrypoint.sh /root/entrypoint.sh
-COPY scripts/ocuser /usr/local/bin/ocuser
-RUN chmod +x ~/entrypoint.sh
-RUN chmod +x /usr/local/bin/ocuser
+RUN chmod +x /entrypoint.sh
 
-ENTRYPOINT ["/root/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
 
-EXPOSE 443
+EXPOSE 4444
+
 CMD ["ocserv", "-c", "/etc/ocserv/ocserv.conf", "-f"]

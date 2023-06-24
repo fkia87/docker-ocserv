@@ -1,15 +1,12 @@
 version: '3.0'
+
 services:
   ocserv:
-    image: pezhvak/ocserv:latest
+    image: fkia-ocserv:latest
+    build: .
     restart: always
-    container_name: ocserv
+    container_name: fkia-ocserv
     privileged: true
-    hostname: <domain>
-    ports:
-      - 1342:443/udp
-      - 1342:443
+    # hostname: <domain>
     volumes:
-      - "./data:/etc/ocserv/data"
-      - ./certs/live/<domain>/fullchain.pem:/etc/ocserv/server-cert.pem
-      - ./certs/live/<domain>/privkey.pem:/etc/ocserv/server-key.pem
+      - "./ocserv:/etc/ocserv/:ro"
