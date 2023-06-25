@@ -7,6 +7,6 @@ services:
     restart: always
     container_name: fkia-ocserv
     privileged: true
-    # hostname: <domain>
+    hostname: ocserv
     volumes:
       - "./ocserv:/etc/ocserv/:ro"
